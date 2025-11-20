@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dynamic Rows Form</title>
+<style>
+        body { font-family: Arial, sans-serif; }
+        .row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        input, select { padding: 6px; }
+        button { padding: 6px 12px; }
+        #jsContainer { display: flex; flex-direction: column; gap: 10px; }
+</style>
+</head>
+<body>
+ 
+<h2>Dynamic Input Form</h2>
+ 
+<!-- Container for dynamic rows -->
+<div id="jsContainer"></div>
+ 
+<!-- Save Button -->
+<div class="row">
+<button onclick="saveData()">Save</button>
+</div>
+ 
+<!-- Display Result -->
+<div id="result"></div>
+ 
+<script>
+const jsContainer = document.getElementById("jsContainer");
+const maxRows = 6;
+ 
+// Function to create a new row
+function createRow() {
+    const newRow = document.createElement("div");
+    newRow.className = "row";
+ 
+    // Text input
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Type something";
+    newRow.appendChild(input);
+ 
+    // Dropdown
+    const select = document.createElement("select");
+    select.innerHTML = `
+<option value="">Select type</option>
+<option value="Name">Name</option>
+<option value="Address">Address</option>
+<option value="Title">Title</option>
+    `;
+    newRow.appendChild(select);
+ 
+    // Add Button
+    const addBtn = document.createElement("button");
+    addBtn.textContent = "Add";
+    newRow.appendChild(addBtn);
+ 
+    // Add button click handler
+    addBtn.addEventListener("click", function() {
+        const textVal = input.value.trim();
+        const typeVal = select.value.trim();
+ 
+        if (textVal === "" || typeVal === "") {
+            alert("Both fields must be filled before adding a new row.");
+            return;
+        }
+ 
+        const currentRows = jsContainer.querySelectorAll(".row");
+        if (currentRows.length >= maxRows) {
+            alert(`Maximum of ${maxRows} rows allowed.`);
+            return;
+        }
+ 
+        // Disable current row inputs and add button
+        input.disabled = true;
+        select.disabled = true;
+        addBtn.disabled = true;
+ 
+        // Create next row
+        createRow();
+    });
+ 
+    jsContainer.appendChild(newRow);
+}
+ 
+// Initialize first row on page load
+createRow();
+ 
+// Save function
+function saveData() {
+    const rows = jsContainer.querySelectorAll(".row");
+    const rowValues = [];
+ 
+    rows.forEach(row => {
+        const input = row.querySelector("input");
+        const select = row.querySelector("select");
+        if (input && select) {
+            const textVal = input.value.trim();
+            const typeVal = select.value.trim();
+            if (textVal && typeVal) {
+                rowValues.push({ text: textVal, type: typeVal });
+            }
+        }
+    });
+ 
+    let resultHTML = rowValues.map((r,i) => `Row ${i+1}: Text: ${r.text}, Type: ${r.type}`).join("<br>");
+ 
+    document.getElementById("result").innerHTML = `<h3>Saved Data:</h3>${resultHTML}`;
+}
+</script>
+ 
+</body>
+</html>
